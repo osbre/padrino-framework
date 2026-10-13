@@ -6,7 +6,7 @@
 - NEW `flash_tag(..., bootstrap: 5)` adds a Bootstrap 5 dismiss button (@osbre)
 - NEW `Padrino::Admin::BootstrapUpgrade` rewrites Bootstrap 3 markup in ERB, Haml, Slim and JavaScript to Bootstrap 5, and notes what it can't rewrite (@osbre)
 - NEW `padrino g admin_upgrade` moves an existing admin to Bootstrap 5: files still as generated are regenerated, edited views are converted in place, and whatever needs a human is listed with its line (@osbre)
-- WARN Existing admins keep working as they are, but `padrino g admin_page` now generates Bootstrap 5 views that need the new admin layout and assets; it warns on a Bootstrap 3 admin and suggests `padrino g admin_upgrade`
+- NEW Existing admins can stay on Bootstrap 3: `padrino g admin_page` detects a Bootstrap 3 admin, keeps generating Bootstrap 3 views for it, and mentions `padrino g admin_upgrade` (@osbre)
 - FIX `Padrino::Admin::BootstrapUpgrade` no longer raises on Bootstrap 3 affix and `data-loading-text` markup, and notes any jQuery left over
 - REMOVE The vendored Bootstrap 3 LESS sources and the `bootstrap:*` rake tasks of padrino-admin
 - NEW #2331 Faster boot outside development: files are no longer tracked for reloading unless `Padrino::Reloader.enabled = true` (@osbre)

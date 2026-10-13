@@ -45,26 +45,37 @@ module Padrino
           @admin_name = options[:admin_name].classify
           @admin_path = options[:admin_name].underscore
           @admin_model = options[:admin_model]
-          if bootstrap3? && !options[:destroy]
+          @bootstrap3 = bootstrap3?
+          if @bootstrap3 && !options[:destroy]
             upgrade = @admin_path == 'admin' ? 'padrino g admin_upgrade' : "padrino g admin_upgrade -a=#{@admin_path}"
-            say "This admin still runs Bootstrap 3 and jQuery, but new pages are made for Bootstrap 5. Run '#{upgrade}' first.", :yellow
+            say "This admin is still on Bootstrap 3, so its new pages are too. Run '#{upgrade}' when you want Bootstrap 5.", :yellow
           end
           models.each do |model|
             @orm = default_orm || Padrino::Admin::Generators::Orm.new(model, adapter)
             self.behavior = :revoke if options[:destroy]
             empty_directory destination_root("#{@admin_path}/views/#{@orm.name_plural}")
 
-            template 'templates/page/controller.rb.tt',       destination_root("#{@admin_path}/controllers/#{@orm.name_plural}.rb")
-            template "templates/#{ext}/page/_form.#{ext}.tt", destination_root("#{@admin_path}/views/#{@orm.name_plural}/_form.#{ext}")
-            template "templates/#{ext}/page/edit.#{ext}.tt",  destination_root("#{@admin_path}/views/#{@orm.name_plural}/edit.#{ext}")
-            template "templates/#{ext}/page/index.#{ext}.tt", destination_root("#{@admin_path}/views/#{@orm.name_plural}/index.#{ext}")
-            template "templates/#{ext}/page/new.#{ext}.tt",   destination_root("#{@admin_path}/views/#{@orm.name_plural}/new.#{ext}")
+            template 'templates/page/controller.rb.tt', destination_root("#{@admin_path}/controllers/#{@orm.name_plural}.rb")
+            template page_template('_form'), destination_root("#{@admin_path}/views/#{@orm.name_plural}/_form.#{ext}")
+            template page_template('edit'),  destination_root("#{@admin_path}/views/#{@orm.name_plural}/edit.#{ext}")
+            template page_template('index'), destination_root("#{@admin_path}/views/#{@orm.name_plural}/index.#{ext}")
+            template page_template('new'),   destination_root("#{@admin_path}/views/#{@orm.name_plural}/new.#{ext}")
 
             options[:destroy] ? remove_project_module(@orm.name_plural) : add_project_module(@orm.name_plural)
           end
         else
           say 'You are not at the root of a Padrino application! (config/boot.rb not found)'
         end
+      end
+
+      private
+
+      # The template for page +view+, matching a Bootstrap 3 admin unless the project has its own.
+      def page_template(view)
+        path = "templates/#{ext}/page/#{view}.#{ext}.tt"
+        return path if !@bootstrap3 || File.exist?(destination_root('generators', path))
+
+        "templates/bootstrap3/#{ext}/page/#{view}.#{ext}.tt"
       end
     end
   end

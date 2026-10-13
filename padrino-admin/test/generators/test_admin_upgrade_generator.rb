@@ -106,14 +106,21 @@ describe 'AdminUpgradeGenerator' do
   end
 
   describe 'the admin page generator' do
-    it 'should suggest the upgrade on a Bootstrap 3 admin only' do
+    it 'should keep making Bootstrap 3 pages for a Bootstrap 3 admin until it is upgraded' do
       root = admin('old', 'slim', bootstrap3: true)
-      out, = capture_io { generate(:admin_page, 'page', "--root=#{root}") }
-      assert_match(/still runs Bootstrap 3.*padrino g admin_upgrade/, out)
+      views = "#{root}/admin/views/friends"
+      read_views = -> { Dir["#{views}/*"].sort.to_h { |path| [path, File.read(path)] } }
+      before = read_views.call
+      FileUtils.rm_rf(views)
+      out, = capture_io { generate(:admin_page, 'friend', "--root=#{root}") }
+      assert_match(/still on Bootstrap 3.*padrino g admin_upgrade/, out)
+      assert_equal before, read_views.call
+      assert_match(/list-menu-link/, before["#{views}/index.slim"])
 
       upgrade(root)
       out, = capture_io { generate(:admin_page, 'section', "--root=#{root}") }
       refute_match(/Bootstrap 3/, out)
+      refute_match(/list-menu-link/, File.read("#{root}/admin/views/sections/index.slim"))
     end
   end
 end
