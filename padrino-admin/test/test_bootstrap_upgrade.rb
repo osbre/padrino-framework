@@ -145,9 +145,9 @@ describe 'BootstrapUpgrade' do
     end
   end
 
-  describe 'shipped Bootstrap 3 templates' do
-    templates = File.expand_path('../lib/padrino-admin/generators/templates', __dir__)
-    Dir["#{templates}/{erb,haml,slim}/**/*.tt", "#{templates}/assets/javascripts/application.js"].sort.each do |file|
+  describe 'Bootstrap 3 admin templates' do
+    templates = File.expand_path('fixtures/bootstrap3', __dir__)
+    Dir["#{templates}/**/*.{tt,js}"].sort.each do |file|
       it "should convert #{file.sub("#{templates}/", '')} once and for all" do
         type = Padrino::Admin::BootstrapUpgrade.type_for(file)
         source = File.read(file)
@@ -155,6 +155,18 @@ describe 'BootstrapUpgrade' do
         assert_equal source.lines.size, result.source.lines.size
         assert_equal result.source, convert(result.source, type).source
         refute_match(/(?<![\w-])(btn-default|btn-small|pull-(left|right)|table-condensed|popover-(title|content)|data-toggle)(?![\w-])/, result.source)
+      end
+    end
+  end
+
+  describe 'shipped Bootstrap 5 admin templates' do
+    templates = File.expand_path('../lib/padrino-admin/generators/templates', __dir__)
+    Dir["#{templates}/{erb,haml,slim}/**/*.tt", "#{templates}/assets/javascripts/application.js"].sort.each do |file|
+      it "should leave #{file.sub("#{templates}/", '')} as it is" do
+        source = File.read(file)
+        result = convert(source, Padrino::Admin::BootstrapUpgrade.type_for(file))
+        assert_equal source, result.source
+        assert_empty result.notes
       end
     end
   end

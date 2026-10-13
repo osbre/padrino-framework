@@ -28,6 +28,15 @@ describe 'AssetTagHelpers' do
       assert_html_has_tag(actual_html, 'div.error#area', content: flash[:error])
       assert_html_has_no_tag(actual_html, 'div.warning')
     end
+    it 'should display a Bootstrap 3 dismiss button' do
+      actual_html = flash_tag(:notice, bootstrap: true)
+      assert_html_has_tag(actual_html, 'div.notice button.close', 'data-dismiss' => 'alert')
+    end
+    it 'should display a Bootstrap 5 dismiss button' do
+      actual_html = flash_tag(:notice, bootstrap: 5)
+      assert_html_has_tag(actual_html, 'div.notice button.btn-close', 'data-bs-dismiss' => 'alert', 'aria-label' => 'Close')
+      assert_html_has_no_tag(actual_html, 'button.close')
+    end
   end
 
   describe 'for #link_to method' do

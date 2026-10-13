@@ -1,18 +1,22 @@
 <% @orm.column_fields.each_with_index do |column, index| -%>
 <%% error = <%= @orm.has_error(column[:name]) %> %>
-<fieldset class='control-group <%%= error ? 'has-error' : ''%>'>
-  <%%= f.label :<%= column[:name] %>, class: 'control-label' %>
-  <div class='controls'>
-    <%%= f.<%= column[:field_type] %> :<%= column[:name] %>, class: 'form-control input-xlarge input-with-feedback'<%- if (index == 0) -%>, autofocus: true<%- end -%> %>
-    <span class='help-inline'><%%= error ? f.error_message_on(:<%= column[:name] %>) : 'Ex: a simple text' %></span>
-  </div>
-</fieldset>
-<% end %>
+<%- if column[:field_type] == :check_box -%>
+<div class="form-check mb-3">
+  <%%= f.check_box :<%= column[:name] %>, class: "form-check-input#{' is-invalid' if error}" %>
+  <%%= f.label :<%= column[:name] %>, class: 'form-check-label' %>
+  <%%= f.error_message_on :<%= column[:name] %>, tag: :div, class: 'invalid-feedback' %>
+</div>
+<%- else -%>
+<div class="mb-3">
+  <%%= f.label :<%= column[:name] %>, class: 'form-label' %>
+  <%%= f.<%= column[:field_type] %> :<%= column[:name] %>, class: "form-control#{' is-invalid' if error}"<%- if index == 0 -%>, autofocus: true<%- end -%> %>
+  <%%= f.error_message_on :<%= column[:name] %>, tag: :div, class: 'invalid-feedback' %>
+</div>
+<%- end -%>
+<% end -%>
 
 <div class="form-actions">
+  <%%= link_to pat(:cancel), url(:<%= @orm.name_plural %>, :index), class: 'btn btn-outline-secondary' %>
+  <%%= f.submit pat(:save_and_continue), class: 'btn btn-outline-primary', name: 'save_and_continue' %>
   <%%= f.submit pat(:save), class: 'btn btn-primary' %>
-  &nbsp;
-  <%%= f.submit pat(:save_and_continue), class: 'btn btn-info', name: 'save_and_continue' %>
-  &nbsp;
-  <%%= link_to pat(:cancel), url(:<%= @orm.name_plural %>, :index), class: 'btn btn-default' %>
 </div>
