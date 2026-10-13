@@ -143,10 +143,20 @@ describe 'BootstrapUpgrade' do
     it 'should report jQuery plugin calls' do
       assert_match(/\.modal\(\)/, convert(%($('#x').modal('show');), :js).notes.first.message)
     end
+
+    it 'should report any jQuery left, but not Ruby globals' do
+      assert_match(/jQuery is no longer loaded/, convert(%(jQuery.ajax('/x');), :js).notes.first.message)
+      assert_empty convert(%(<%= $stdout.sync %>)).notes
+    end
+
+    it 'should report removed plugins without a class to name' do
+      assert_match(/sticky-top/, convert(%(<div data-spy="affix">)).notes.first.message)
+      assert_match(/loading state/, convert(%(<button data-loading-text="...">)).notes.first.message)
+    end
   end
 
   describe 'Bootstrap 3 admin templates' do
-    templates = File.expand_path('fixtures/bootstrap3', __dir__)
+    templates = File.expand_path('../lib/padrino-admin/generators/templates/bootstrap3', __dir__)
     Dir["#{templates}/**/*.{tt,js}"].sort.each do |file|
       it "should convert #{file.sub("#{templates}/", '')} once and for all" do
         type = Padrino::Admin::BootstrapUpgrade.type_for(file)

@@ -89,20 +89,10 @@ module Padrino
           params << '-d' if options[:destroy]
 
           Padrino::Generators::Model.start(params)
-          column = Struct.new(:name, :type)
-          columns = %i[id name surname email].map { |col| column.new(col) }
-          column_fields = [
-            { name: :name,                  field_type: :text_field },
-            { name: :surname,               field_type: :text_field },
-            { name: :email,                 field_type: :text_field },
-            { name: :password,              field_type: :password_field },
-            { name: :password_confirmation, field_type: :password_field },
-            { name: :role,                  field_type: :text_field }
-          ]
 
           unless options[:destroy]
             admin_app = Padrino::Generators::AdminPage.new([@model_singular], root: options[:root], destroy: options[:destroy], admin_model: @model_singular, admin_name: @admin_name)
-            admin_app.default_orm = Padrino::Admin::Generators::Orm.new(@model_singular, orm, columns, column_fields)
+            admin_app.default_orm = account_orm(@model_singular)
             admin_app.invoke_all
           end
 

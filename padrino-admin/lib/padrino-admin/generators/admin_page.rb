@@ -45,6 +45,10 @@ module Padrino
           @admin_name = options[:admin_name].classify
           @admin_path = options[:admin_name].underscore
           @admin_model = options[:admin_model]
+          if bootstrap3? && !options[:destroy]
+            upgrade = @admin_path == 'admin' ? 'padrino g admin_upgrade' : "padrino g admin_upgrade -a=#{@admin_path}"
+            say "This admin still runs Bootstrap 3 and jQuery, but new pages are made for Bootstrap 5. Run '#{upgrade}' first.", :yellow
+          end
           models.each do |model|
             @orm = default_orm || Padrino::Admin::Generators::Orm.new(model, adapter)
             self.behavior = :revoke if options[:destroy]

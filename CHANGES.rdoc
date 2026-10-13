@@ -5,7 +5,9 @@
 - NEW Generated admins use Bootstrap 5.3 and Font Awesome 7 without jQuery, follow the system light or dark theme, and get a simpler list with a select-all checkbox, bulk delete and a confirmation before each delete (@osbre)
 - NEW `flash_tag(..., bootstrap: 5)` adds a Bootstrap 5 dismiss button (@osbre)
 - NEW `Padrino::Admin::BootstrapUpgrade` rewrites Bootstrap 3 markup in ERB, Haml, Slim and JavaScript to Bootstrap 5, and notes what it can't rewrite (@osbre)
-- WARN Existing admins keep working as they are, but `padrino g admin_page` now generates Bootstrap 5 views that need the new admin layout and assets
+- NEW `padrino g admin_upgrade` moves an existing admin to Bootstrap 5: files still as generated are regenerated, edited views are converted in place, and whatever needs a human is listed with its line (@osbre)
+- WARN Existing admins keep working as they are, but `padrino g admin_page` now generates Bootstrap 5 views that need the new admin layout and assets; it warns on a Bootstrap 3 admin and suggests `padrino g admin_upgrade`
+- FIX `Padrino::Admin::BootstrapUpgrade` no longer raises on Bootstrap 3 affix and `data-loading-text` markup, and notes any jQuery left over
 - REMOVE The vendored Bootstrap 3 LESS sources and the `bootstrap:*` rake tasks of padrino-admin
 - NEW #2331 Faster boot outside development: files are no longer tracked for reloading unless `Padrino::Reloader.enabled = true` (@osbre)
 - WARN #2331 Reloading outside development (`enable :reload`, `Padrino.reload!` or `reload!` in the console) needs `Padrino::Reloader.enabled = true` before `Padrino.load!`. Without it, app files and controllers still reload, but changes to lib, models, shared and app prerequisites (e.g. app/models) are skipped with a warning

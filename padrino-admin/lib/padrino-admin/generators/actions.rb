@@ -38,6 +38,25 @@ module Padrino
         end
 
         ##
+        # The admin model, with the columns its pages are generated from (the model may not exist yet).
+        #
+        def account_orm(model)
+          column = Struct.new(:name, :type)
+          columns = %i[id name surname email].map { |col| column.new(col) }
+          column_fields = %i[name surname email password password_confirmation role].map do |name|
+            { name: name, field_type: name.to_s.start_with?('password') ? :password_field : :text_field }
+          end
+          Padrino::Admin::Generators::Orm.new(model, orm, columns, column_fields)
+        end
+
+        ##
+        # Tell us whether the admin layout still loads Bootstrap 3.
+        #
+        def bootstrap3?
+          File.read(destination_root("#{@admin_path}/views/layouts/application.#{ext}")).include?('jquery-1.11.0.min') rescue false
+        end
+
+        ##
         # Add access_control permission in our app.rb.
         #
         def add_project_module(controller)

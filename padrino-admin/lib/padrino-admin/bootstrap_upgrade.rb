@@ -81,7 +81,8 @@ module Padrino
         /\)\.(modal|tooltip|popover|dropdown|tab|collapse|alert|button|carousel|scrollspy)\(/ =>
           'jQuery .%s() only exists when jQuery loads before Bootstrap 5; prefer bootstrap.*.getOrCreateInstance(element)',
         /data-(?:bs-)?spy=\W*affix/ => 'Affix was removed; use the sticky-top class or position: sticky',
-        /data-loading-text/ => 'the button loading state was removed; toggle the text and disabled state yourself'
+        /data-loading-text/ => 'the button loading state was removed; toggle the text and disabled state yourself',
+        /(?<![\w$.])(?:\$|jQuery)[.(]/ => 'jQuery is no longer loaded; use plain DOM APIs (document.querySelector, addEventListener)'
       }.freeze
 
       PLACEMENTS   = { 'top' => 'top', 'right' => 'end', 'bottom' => 'bottom', 'left' => 'start' }.freeze
@@ -109,7 +110,7 @@ module Padrino
           source = rewrite_shorthand(source, type, notes) if SHORTHAND.key?(type)
           source = rewrite_data_attributes(source)
           source.each_line.with_index(1) do |line, number|
-            LINE_NOTES.each { |pattern, message| notes << Note.new(number, message.sub('%s', ::Regexp.last_match(1))) if line =~ pattern }
+            LINE_NOTES.each { |pattern, message| notes << Note.new(number, message.sub('%s', ::Regexp.last_match(1).to_s)) if line =~ pattern }
           end
           Result.new(source, notes.uniq.sort_by(&:line))
         end
